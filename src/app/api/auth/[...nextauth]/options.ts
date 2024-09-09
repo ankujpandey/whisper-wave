@@ -15,18 +15,17 @@ export const authOptions: NextAuthOptions = {
                 password: {label: "Password", type: "password"},
             },
             async authorize(credentials: any): Promise<any>{
-                const x = await dbConnect();
-                console.log("x------------------------------", x)
+                await dbConnect();
                 try {
                     const user = await UserModel.findOne({
                         $or:[
-                            {email: credentials.Identifier},
-                            {username: credentials.Identifier}
+                            {email: credentials.identifier},
+                            {username: credentials.identifier}
                         ]
                     })
 
                     if(!user){
-                        throw new Error('No user Found with this email');
+                        throw new Error('No user Found with this username/email');
                     }
 
                     if(!user.isVerified){
@@ -42,7 +41,7 @@ export const authOptions: NextAuthOptions = {
 
                 } catch (error: any) {
                     console.log("error----------------", error)
-                    throw new Error(error);
+                    throw error;
                 }
             }
         })
@@ -52,7 +51,7 @@ export const authOptions: NextAuthOptions = {
             if(user){
                 token._id = user._id?.toString();
                 token.isVerified = user.isVerified;
-                token.isAcceptingMessages = user.isAcceptingMessages;
+                token.isAccepetingMessage = user.isAccepetingMessage;
                 token.username = user.username;
             }
             return token
@@ -61,17 +60,17 @@ export const authOptions: NextAuthOptions = {
             if(token){
                 session.user._id = token._id;
                 session.user.isVerified = token.isVerified;
-                session.user.isAcceptingMessages = token.isAcceptingMessages;
+                session.user.isAccepetingMessage = token.isAccepetingMessage;
                 session.user.username = token.username;
             }
             return session
         },
     },
-    pages: {
-        signIn: '/sign-in'
-    },
     session: {
         strategy: "jwt"
     },
-    secret: process.env.NEXT_AUTH_SECRET_KEY
+    secret: process.env.NEXT_AUTH_SECRET_KEY,
+    pages: {
+        signIn: '/sign-in'
+    }
 }

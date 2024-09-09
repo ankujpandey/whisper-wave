@@ -15,9 +15,9 @@ import { signIn } from "next-auth/react"
 
 function page() {
     const [isSubmitting, setIssubmitting] = useState(false);
+    const router = useRouter();
     
     const {toast} = useToast();
-    const router = useRouter()
     
     //zod validation
     const form = useForm <z.infer<typeof signInSchema>>({
@@ -30,25 +30,33 @@ function page() {
     
     const onSubmit = async (data: z.infer<typeof signInSchema>) => {
       setIssubmitting(true);
+      try {
+        
         const result = await signIn('credentials',{
           redirect: false,
           identifier: data.identifier,
           password: data.password
         })
 
+        console.log("result-------------", result)
+
         if(result?.error){
           toast({
             title: "Login failed",
-            description: "Incorrect username or password",
+            description: result?.error ? result?.error : "Incorrect username or password",
             variant: "destructive"
           })
           setIssubmitting(false);
         }
 
         if(result?.url){
+          console.log("url found")
+          router.push('/dashboard');
           setIssubmitting(false);
-          router.replace('/dashboard');
         }
+      } catch (error) {
+        console.log("error-------",error);
+      }
     }
 
     return (
@@ -101,8 +109,8 @@ function page() {
                 </Form>
                 <div className="text-center mt-4">
                     <p>
-                        Already a member? {' '}
-                        <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">Sing in</Link>
+                        Not a member? {' '}
+                        <Link href="/sign-up" className="text-blue-600 hover:text-blue-800">Sign In</Link>
                     </p>
                 </div>
             </div>
