@@ -1,12 +1,12 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/options";
+import { authOptions } from "../../auth/[...nextauth]/options";
 import dbConnect from "@/lib/mongoConnect";
 import UserModel from "@/model/user.model";
 import { User } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import mongoose from "mongoose";
 
-export async function GET(request: NextRequest){
+export async function DELETE(request: NextRequest, {params}: {params: {messageid: string}}){
+    const messageId = params.messageid;
     await dbConnect();
 
     const session = await getServerSession(authOptions);
@@ -21,40 +21,34 @@ export async function GET(request: NextRequest){
         )
     }
 
-    const userId = new mongoose.Types.ObjectId(user._id);
-    console.log("userId-----------", userId)
     try {
-        const user = await UserModel.aggregate([
-            {$match: {id: userId}},
-            {$unwind: '$messages'},
-            {$sort: {'messages.createdAt': -1}},
-            {$group: {_id: '$_id', messages: {$push: '$messages'}}}
-        ]).exec()
+        const updateResult = await UserModel.updateOne(
+            {_id: user._id},
+            {$pull: {messages: {_id: messageId}}}
+        )
 
-        console.log("user-----------", user)
-
-        if(!user || user.length === 0){
+        if(updateResult.modifiedCount == 0){
             return NextResponse.json(
                 {
                     success: false,
-                    message: "No messages found for the user"
-                },{status: 401}
+                    message: "Message not found or already deleted"
+                },{status: 404}
             )
         }
 
         return NextResponse.json(
             {
                 success: true,
-                messages: user[0].messages
+                message: "Message Deleted"
             },{status: 200}
         )
 
     } catch (error) {
-        console.log("failed to get message--", error);
+        console.log("failed to delete message--", error);
         return NextResponse.json(
             {
                 success: false,
-                message: "Error in getting message"
+                message: "Error in deleting message"
             },{status: 500}
         )
     }
