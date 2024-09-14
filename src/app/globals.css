@@ -86,3 +86,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 200px;
+  height: 200px;
+  background-color: rgba(253, 189, 254, 0.1);
+  border-radius: 50%;
+  z-index: -1;
+}
+
+.container::after {
+  content: '';
+  position: absolute;
+  bottom: 10%;
+  right: 5%;
+  width: 150px;
+  height: 150px;
+  background-color: rgba(189, 216, 253, 0.2);
+  border-radius: 50%;
+  z-index: -1;
+}
