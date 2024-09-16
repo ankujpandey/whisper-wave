@@ -1,11 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { StreamingTextResponse } from 'ai';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 
 export const runtime = 'edge';
 
-export async function POST(req: NextResponse) {
+export async function POST(req: NextRequest) {
     const apiKey = process.env.PUBLIC_GOOGLE_API_KEY as string;
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -24,7 +23,6 @@ export async function POST(req: NextResponse) {
         // Print text as it comes in.
         const stream = new ReadableStream({
             async start(controller) {
-                
                 for await (const chunk of response.stream) {
                     const chunkText = chunk.text();
                     console.log("Chunk text:", chunkText);
@@ -45,7 +43,7 @@ export async function POST(req: NextResponse) {
         console.error('An unexpected error occurred:', error);
         return NextResponse.json({
             success: false,
-            message: error
+            message: 'An error occurred',
         }, { status: 500 });
     }
 }
