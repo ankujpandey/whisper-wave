@@ -50,7 +50,7 @@ function Page() {
         }finally{
             setIsSwitchLoading(false);
         }
-    }, [setValue])
+    }, [setValue, toast])
 
     const fetchMessages = useCallback(async (refresh: boolean = false) =>{
         setIsLoading(true);

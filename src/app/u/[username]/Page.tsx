@@ -31,7 +31,7 @@ const parseStringMessages = (messageString: string): string[] => {
 const initialMessageString =
   "What's your favorite movie?||Do you have any pets?||What's your dream job?";
 
-const sendMessage = () => {
+const SendMessage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [streamData, setStreamData] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -196,4 +196,4 @@ const sendMessage = () => {
   );
 };
 
-export default sendMessage;
+export default SendMessage;
