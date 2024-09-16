@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
     const apiKey = process.env.PUBLIC_GOOGLE_API_KEY as string;
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -23,10 +23,12 @@ export async function POST(req: NextRequest) {
         // Print text as it comes in.
         const stream = new ReadableStream({
             async start(controller) {
+                const encoder = new TextEncoder();
+
                 for await (const chunk of response.stream) {
                     const chunkText = chunk.text();
                     console.log("Chunk text:", chunkText);
-                    controller.enqueue(chunkText);
+                    controller.enqueue(encoder.encode(chunkText));
                 }
                 controller.close();
             }
