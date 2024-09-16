@@ -24,11 +24,11 @@ export async function POST(req: Request) {
         const stream = new ReadableStream({
             async start(controller) {
                 const encoder = new TextEncoder();
-                
+
                 for await (const chunk of response.stream) {
                     const chunkText = chunk.text();
                     console.log("Chunk text:", chunkText);
-                    controller.enqueue(chunkText);
+                    controller.enqueue(encoder.encode(chunkText));
                 }
                 controller.close();
             }
